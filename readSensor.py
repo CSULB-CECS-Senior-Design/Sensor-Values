@@ -1,6 +1,6 @@
-#!/usr/bin/python
-#encoding:utf-8
-
+# Continuous MQ-2 Gas Sensor Read
+# Author: Grecia Francisco and Michelle Tran
+ 
 # Libraries needed
 import time
 import board 
@@ -24,10 +24,6 @@ chan = AnalogIn(ads, ADS.P0)
 print("MQ2 Warming Up!")
 time.sleep(5) # Give 5 seconds to warm up
 
-print("Printing Sensor Values.. ")
-
-print("{:>5}\t{:>5}".format('Raw Value', 'Voltage Value'))
-
 while True:
-    print("{:>5}\t\t{:>5.5f}".format(chan.value, chan.voltage)) # Get raw value read from analog input and the voltage value as well
-    time.sleep(0.5) # allow delay between every read of about .5 sec
+	print(f"raw value: {chan.value}     voltage: {chan.voltage:.3f} volts")
+	time.sleep(0.5) # allow delay between every read of about .5 sec
