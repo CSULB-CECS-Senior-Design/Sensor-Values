@@ -9,6 +9,17 @@ import adafruit_ads1x15.ads1015 as ADS
 from adafruit_ads1x15.analog_in import AnalogIn
 import logging
 from ovos_bus_client import MessageBusClient, Message
+import RPi.GPIO as GPIO
+
+# Set up Indicator LEDs
+GPIO.setmode(GPIO.BCM)
+greenLed = 16
+redLed = 20
+GPIO.setup(greenLed, GPIO.OUT)
+GPIO.setup(redLed, GPIO.OUT)
+GPIO.output(greenLed, GPIO.LOW)
+GPIO.output(redLed, GPIO.LOW)
+GPIO.output(greenLed, GPIO.HIGH) # initial state
 
 # Setting up client to connect to a local mycroft instance
 client = MessageBusClient()
@@ -31,9 +42,17 @@ channelA0 = AnalogIn(ads, ADS.P0)
 logging.info("MQ2 Warming Up!")
 time.sleep(5) # Give 5 seconds to warm up
 
-while True:
-	formatted_output = f"raw value: {channelA0.value}     voltage: {channelA0.voltage:.3f} volts"
-	# print(formatted_output)
-	time.sleep(0.5) # allow delay between every read of about .5 sec
-	logging.info(formatted_output)
-	client.emit(Message('speak', data={'utterance': str(channelA0.value)}))
+try:
+	while True:
+		formatted_output = f"raw value: {channelA0.value}     voltage: {channelA0.voltage:.3f} volts"
+		time.sleep(0.5) # allow delay between every read of about .5 sec
+		logging.info(formatted_output)
+		if channelA0.value >= 10000:
+			GPIO.output(greenLed, GPIO.LOW)
+			GPIO.output(redLed, GPIO.HIGH)
+		else:
+			GPIO.output(greenLed, GPIO.HIGH)
+			GPIO.output(redLed, GPIO.LOW)	
+		# client.emit(Message('speak', data={'utterance': str(channelA0.value)}))
+except Exception:
+	GPIO.cleanup()
